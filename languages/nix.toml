@@ -1,0 +1,26 @@
+name = "nix"
+entrypoint = "main.sh"
+extensions = [
+  "sh"
+]
+packages = [
+]
+setup = [
+  """
+  mkdir -m 0755 /nix && chown runner /nix
+  su runner
+  curl -L https://nixos.org/nix/install | sh
+  nix-channel --update
+  nix search -u > /dev/null
+  """
+]
+[run]
+command = [
+  "bash",
+  "main.sh"
+]
+
+[tests]
+  [tests.hello]
+  code = "echo hello"
+  output = "hello\n"
