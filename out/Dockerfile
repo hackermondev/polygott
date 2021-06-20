@@ -142,7 +142,7 @@ RUN --mount=type=bind,from=polygott-phase1.0,source=/var/lib/apt/lists,target=/v
       r-cran-stringr \
       r-recommended \
       rake-compiler \
-      rakudo-pkg \
+      rakudo-pkg=2021.3.0-01 \
       ruby \
       ruby-dev \
       rubygems \
@@ -535,6 +535,16 @@ RUN --mount=type=bind,from=polygott-phase1.0,source=/var/lib/apt/lists,target=/v
     /bin/bash phase2.sh
 
 
+## The individual language layer for nix.
+FROM polygott-phase1.5 AS polygott-phase2-nix
+COPY ./out/share/polygott/phase2.d/nix /phase2.sh
+RUN --mount=type=bind,from=polygott-phase1.0,source=/var/lib/apt/lists,target=/var/lib/apt/lists,ro \
+    --mount=type=tmpfs,target=/var/lib/apt/lists/auxfiles \
+    --mount=type=tmpfs,target=/tmp \
+    --mount=type=tmpfs,target=/var/log \
+    /bin/bash phase2.sh
+
+
 ## The individual language layer for objective-c.
 FROM polygott-phase1.5 AS polygott-phase2-objective-c
 COPY ./out/share/polygott/phase2.d/objective-c /phase2.sh
@@ -782,7 +792,7 @@ RUN git clone --depth=1 https://github.com/novnc/websockify.git /root/websockify
 
 
 ## Import UPM.
-FROM replco/upm:light@sha256:7969cc1285d7900023d68cd3c5fd5155bc9506ac1b0bae56dc49dc690de2c383 AS upm
+FROM replco/upm:light@sha256:fc729728ec975f918953ad6a12497de712ca0858344ddbbeb638f692c60c6167 AS upm
 
 
 ## The polygott-specific tools.
@@ -807,6 +817,10 @@ COPY ./run_dir /run_dir/
 RUN ln -sf /usr/lib/chromium-browser/chromedriver /usr/local/bin
 
 COPY ./extra/apt-install /usr/bin/install-pkg
+RUN mkdir -p /opt/dap/java/ /opt/dap/python/
+COPY ./extra/java-dap /opt/dap/java/run
+COPY ./extra/py-dap /opt/dap/python/run
+RUN chmod +x /opt/dap/java/run /opt/dap/python/run
 
 COPY ./extra/_test_runner.py /home/runner/_test_runner.py
 COPY ./extra/cquery11 /opt/homes/cpp11/.cquery
@@ -821,5 +835,6 @@ COPY ./extra/matplotlibrc /config/matplotlib/matplotlibrc
 COPY ./extra/fluxbox/init /etc/X11/fluxbox/init
 COPY ./extra/fluxbox/apps /etc/X11/fluxbox/apps
 COPY ./extra/pulse/client.conf ./extra/pulse/default.pa /etc/pulse/
+COPY ./extra/nixproxy.nix /opt/nixproxy.nix
 
 COPY ./extra/lang-gitignore /etc/.gitignore

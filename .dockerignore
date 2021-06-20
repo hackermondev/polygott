@@ -9,6 +9,8 @@
 !extra/cquery11
 !extra/fluxbox/apps
 !extra/fluxbox/init
+!extra/java-dap
+!extra/py-dap
 !extra/lang-gitignore
 !extra/matplotlibrc
 !extra/polygott-gitignore
@@ -25,6 +27,7 @@
 !out/polygott-x11-vnc
 !out/run-language-server
 !out/run-project
+!extra/nixproxy.nix
 !out/self-test
 !out/share/polygott/phase2.d/*
 !out/share/polygott/self-test.d/*
